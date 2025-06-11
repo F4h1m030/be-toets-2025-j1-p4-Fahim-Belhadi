@@ -12,11 +12,11 @@
 
             <a href="<?= URLROOT; ?>/smartphones/index ">Toon smartphones</a>
 
-            <a href="<?= URLROOT; ?>/sneakers/create">Toon sneakers</a>
+            <a href="<?= URLROOT; ?>/sneakers/index">Toon sneakers</a>
 
-            <a href="<?= URLROOT; ?>/zangeres/create">Toon zangers</a>
+            <a href="<?= URLROOT; ?>/zangeres/index">Toon zangers</a>
 
-            <a href="<?= URLROOT; ?>/cyberaanval/create">Toon cyberaanval</a>
+            <a href="<?= URLROOT; ?>/cyberaanval/index">Toon cyberaanval</a>
 
             <a href="<?= URLROOT; ?>/horloges/index">Toon horloges</a>
 

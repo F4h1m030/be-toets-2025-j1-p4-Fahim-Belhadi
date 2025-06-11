@@ -10,41 +10,26 @@ class Database
     private $dbUser = DB_USER;
     private $dbPass = DB_PASS;
 
-
     private $dbHandler;
     private $statement;
 
     public function __construct()
     {
-        /**
-         * Dit is de connectiestring die nodig voor het maken van een
-         * nieuw PDO object
-         */
         $conn = 'mysql:host=' . $this->dbHost . ';dbname=' . $this->dbName;
 
-        /**
-         * We geven nog wat options mee voor het PDO-object om 
-         * fouten weer te geven
-         */
         $options = array(
-            PDO::ATTR_PERSISTENT =>true,
+            PDO::ATTR_PERSISTENT => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_EMULATE_PREPARES => false
         );
 
         try {
-            /**
-             * Maken we eenverbinding met de database mysql server
-             */
             $this->dbHandler = new PDO($conn, $this->dbUser, $this->dbPass, $options);
         } catch (PDOException $e) {
-            /**
-             * Wanneer er een error optreed daarbij wordt er een PDOException object 
-             * aangemaakt met informatie over de error
-             */
             logger(__LINE__, __METHOD__, __FILE__, $e->getMessage());
             echo "Op dit moment kunnen we u niet helpen... probeer het later nog eens";
-            header('Refresh:30; url=' .URLROOT . '/homepages/index');
+            header('Refresh:30; url=' . URLROOT . '/homepages/index');
+            exit;
         }
     }
 
@@ -53,7 +38,6 @@ class Database
         $this->statement = $this->dbHandler->prepare($sql);
     }
 
-    /** Wanneer je meerdere records verwacht dat gebruik je deze method */
     public function resultSet()
     {
         $this->statement->execute();
@@ -61,16 +45,31 @@ class Database
     }
 
     /**
-     * Deze methode bind de waardes aan de parameters in de query
+     * Bindt waardes aan de query parameters.
+     * 
+     * Deze methode bepaalt automatisch het PDO type als het niet is opgegeven.
      */
     public function bind($parameter, $value, $type = null)
     {
+        if (is_null($type)) {
+            switch (true) {
+                case is_int($value):
+                    $type = PDO::PARAM_INT;
+                    break;
+                case is_bool($value):
+                    $type = PDO::PARAM_BOOL;
+                    break;
+                case is_null($value):
+                    $type = PDO::PARAM_NULL;
+                    break;
+                default:
+                    $type = PDO::PARAM_STR;
+            }
+        }
+
         $this->statement->bindValue($parameter, $value, $type);
     }
 
-    /**
-     * Deze methode voert de query uit
-     */
     public function execute()
     {
         return $this->statement->execute();
@@ -80,11 +79,12 @@ class Database
     {
         $this->statement->execute();
         $result = $this->statement->fetch(PDO::FETCH_OBJ);
-        $this->statement->closecursor();
+        $this->statement->closeCursor();
         return $result;
     }
 
-    public function outQuery($sql) {
+    public function outQuery($sql)
+    {
         return $this->dbHandler->query($sql);
     }
 }
